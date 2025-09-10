@@ -18,7 +18,7 @@
             line-height: 1.6;
             min-height: 100vh;
             padding: 20px;
-            padding-top: 80px; /* Add padding to accommodate fixed header */
+            padding-top: 100px; /* Increased padding to accommodate the fixed header height */
         }
 
         /* NEW: Home button styling */
@@ -67,25 +67,27 @@
 
         .page-container {
             display: flex;
-            min-height: 100vh; /* Adjusted for padding-top */
+            /* min-height: 100vh; Removed as padding-top handles the offset */
             max-width: 1400px;
             margin: 0 auto;
             gap: 20px;
         }
 
-        /* Header styling */
+        /* Header styling - Adjusted for better fixed positioning */
         .header {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             text-align: center;
-            padding: 15px 20px; /* Adjusted padding */
+            /* Reduced padding to make the header height more predictable */
+            padding: 10px 20px;
             background: rgba(10, 10, 10, 0.8);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 0 0 12px 12px; /* Rounded bottom corners */
-            margin-bottom: 25px;
+            border-radius: 0 0 12px 12px;
+            /* Removed margin-bottom as it doesn't affect fixed positioning */
+            /* margin-bottom: 25px; */
             z-index: 1000; /* Ensure it's below the home button */
         }
 
@@ -109,7 +111,7 @@
             margin: 0 auto;
         }
 
-        /* Navigation column */
+        /* Navigation column - Made sticky */
         .nav-column {
             width: 220px;
             background: rgba(10, 10, 10, 0.7);
@@ -117,9 +119,14 @@
             border: 1px solid rgba(0, 212, 255, 0.2);
             border-radius: 12px;
             padding: 20px 15px;
-            height: fit-content;
+            /* height: fit-content; Removed to allow scrolling */
+            /* Changed from 'top: 100px;' to use 'position: sticky;' */
             position: sticky;
-            top: 100px; /* Adjusted for fixed header height */
+            top: 90px; /* Adjusted top value (header height ~70px + 20px gap) */
+            align-self: flex-start; /* Ensures it sticks to the top of its container */
+            /* Added max-height and overflow for scrolling if content is long */
+            max-height: calc(100vh - 120px); /* Adjust based on header/footer height */
+            overflow-y: auto; /* Enable vertical scrolling if needed */
         }
 
         .nav-title {
@@ -181,6 +188,8 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
+            /* Added scroll-padding-top to account for fixed header when scrolling to sections */
+            scroll-padding-top: 100px; /* Should match body padding-top or header height + desired offset */
         }
 
         .card {
@@ -289,7 +298,7 @@
 
         @media (max-width: 768px) {
             body {
-                padding-top: 100px; /* Adjust padding for smaller screens */
+                padding-top: 120px; /* Adjust padding for smaller screens if header height changes */
             }
             .page-container {
                 flex-direction: column;
@@ -297,9 +306,12 @@
 
             .nav-column {
                 width: 100%;
-                position: relative;
+                position: relative; /* Reset sticky for mobile */
                 margin-bottom: 20px;
-                top: 0; /* Reset sticky top for mobile */
+                /* top: 0; */ /* Not needed with relative positioning */
+                align-self: auto; /* Reset align-self */
+                max-height: none; /* Remove max-height restriction on mobile */
+                overflow-y: visible; /* Disable scrolling on mobile */
             }
 
             .main-title {
@@ -549,9 +561,12 @@
                     const targetElement = document.getElementById(targetId);
 
                     if (targetElement) {
-                        window.scrollTo({
-                            top: targetElement.offsetTop - 120, // Adjusted offset for fixed header
-                            behavior: 'smooth'
+                        // Use scrollIntoView with block: 'start' and inline: 'nearest'
+                        // The scroll-padding-top on .content-grid handles the offset
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                            inline: 'nearest'
                         });
                     }
                 });
@@ -577,10 +592,11 @@
                 let current = '';
 
                 sections.forEach(section => {
-                    const sectionTop = section.offsetTop;
+                    const sectionTop = section.getBoundingClientRect().top + window.scrollY;
                     const sectionHeight = section.clientHeight;
 
-                    if (pageYOffset >= (sectionTop - 170)) { // Adjusted threshold
+                    // Adjust threshold for highlighting (e.g., when section is near the top + offset)
+                    if (window.scrollY >= (sectionTop - 120)) { // 120px offset, adjust as needed
                         current = section.getAttribute('id');
                     }
                 });
@@ -594,7 +610,7 @@
             }
 
             window.addEventListener('scroll', highlightSection);
-            highlightSection(); // Initialize on load
+            // highlightSection(); // Initialize on load - removed to prevent initial highlight on page load before scrolling
 
             // Smooth reveal animation for cards
             const cards = document.querySelectorAll('.card');
@@ -636,4 +652,3 @@
     </script>
 </body>
 </html>
-```
