@@ -122,10 +122,11 @@
             /* height: fit-content; Removed to allow scrolling */
             /* Changed from 'top: 100px;' to use 'position: sticky;' */
             position: sticky;
-            top: 90px; /* Adjusted top value (header height ~70px + 20px gap) */
+            /* INCREASED top value to push the nav column content down further */
+            top: 120px; /* Adjusted top value (header height ~70px + desired gap ~50px) */
             align-self: flex-start; /* Ensures it sticks to the top of its container */
             /* Added max-height and overflow for scrolling if content is long */
-            max-height: calc(100vh - 120px); /* Adjust based on header/footer height */
+            max-height: calc(100vh - 150px); /* Adjust based on new top value and footer height */
             overflow-y: auto; /* Enable vertical scrolling if needed */
         }
 
@@ -314,6 +315,9 @@
                 align-self: auto; /* Reset align-self */
                 max-height: none; /* Remove max-height restriction on mobile */
                 overflow-y: visible; /* Disable scrolling on mobile */
+                /* Reset top for mobile */
+                top: auto;
+                padding-top: 20px; /* Add some padding if needed on mobile */
             }
 
             .main-title {
